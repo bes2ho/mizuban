@@ -1,0 +1,22 @@
+form(class="main" method="post" action="")
+  input(type="hidden" name="taId" id="taId" value=`${data._id}`)
+  ul(style="list-style: none;")
+    li
+      label(for="address") 小字：
+      input(type="text" id="zone" name="zone" value=`${data.properties.zone}`)
+    li
+      label(for="address") 住所：
+      input(type="text" id="address" name="address" value=`${data.properties.address}`)
+    li
+      label(for="area") 面積：
+      input(type="text" id="area" name="area" value=`${data.properties.area}`)
+    li
+      label(for="farmer") 管理者：
+      select(name="farmer")
+        each user in headerUsers
+          option(value=user._id selected=(user._id==`${data.properties.farmer}`)) #{user.name}
+    li 
+      label(for="suito") 水稲：
+      input(type="checkbox" id="suito" name="suito" checked=(data.properties.color != "brown"))
+    li
+      button(type="submit" id="tamboSaveSubmit") 保存

@@ -1,0 +1,59 @@
+doctype html
+html(lang="ja")
+  head
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width,initial-scale=1.2")
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/leaflet.css')
+    link(rel='stylesheet', href='/stylesheets/my.css')
+    script(src="/javascripts/leaflet.js")
+    script(type='text/javascript').
+      window.addEventListener('DOMContentLoaded', function(){
+
+        // HTML要素を取得
+        const form_user = document.getElementById("user");
+        
+        form_user.addEventListener("submit", function(e){
+          //- e.preventDefault();
+        
+          const farmer = document.getElementById("farmer1");
+          const mizuban = document.getElementById("mizuban")
+          const data={
+            myId:farmer.value,
+            mizuban:mizuban.checked
+          };
+          console.log(`${farmer.value}, mizuban=${mizuban.checked}`);
+
+          function style2(feature) {
+            return {
+                color: feature.properties.color,
+                fillOpacity: 0.4
+            };
+          };
+          let mizubanLayer = L.geoJson(null, {style: style2});
+
+          if (mizuban){
+            if (map.hasLayer(mizubanLayer)){
+              console.log("pre has mizubanlayer");
+                //- map.removelayer(mizubanLayer);
+            } else {
+              console.log("pre has not mizubanlayer");
+            };
+            fetch('/tambolayers',{
+              method: 'POST', // or 'PUT'
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => mizubanLayer.addData(data));
+            mizubanLayer.addTo(map);
+          };
+        });
+      });
+  body
+    include ./_header.pug
+    block content
+    include ./_footer.pug

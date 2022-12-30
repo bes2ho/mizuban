@@ -1,0 +1,11 @@
+extends layout
+
+block content
+  main 
+    script(type='text/javascript').
+      let user=!{user};
+    h2 個人情報
+    p=user.name 
+    p=user.turn
+
+

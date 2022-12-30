@@ -1,0 +1,76 @@
+html{
+  height:100%;
+  width: 100%;
+}
+body {
+  height: 100%;
+  font-size: 130%;
+  /* margin: 0px; */
+}
+.wrap {
+  display: flex;
+  flex-direction: column;
+  height:100%;
+}
+header#header {
+  /* position: fixed;
+  top: 0px; */
+  width: 98%;
+  height: 50px;
+  padding: 10px;
+  background: #bbb;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+main {
+  flex: 1;
+}
+h1 {
+  color: #364e96;/*文字色*/
+  margin: 10px;
+  font-size: 16px;
+  padding: 0.2em 0;/*上下の余白*/
+  border-top: solid 3px #364e96;/*上線*/
+  border-bottom: solid 3px #364e96;/*下線*/
+}
+/* form.main {
+  margin: 20px;
+} */
+table {
+  margin: 20px;
+  font-size: 70%;
+}
+th, td {
+  padding: 2px 10px; /* 上下 左右 */
+  vertical-align:top;
+}
+th {
+  background-color: #d0ebfd; /* 見出しの背景色 */
+}
+tbody tr.clickable:hover td {
+  background: #94a9c4;
+  cursor: pointer;
+}
+button {
+  color:#fff;
+  background-color: rgb(119, 119, 119);
+  /* appearance: none; */
+  border: 0;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 90%;
+  padding: 2px 8px;
+}
+li ul {
+  margin:0 0 0 1em;
+}
+
+/* .menu {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.selection {
+  text-align: left;
+} */

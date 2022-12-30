@@ -1,0 +1,26 @@
+doctype html
+html(lang="ja")
+  head
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width,initial-scale=1.0")
+    title= 水番
+    //- link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/leaflet.css')
+    link(rel='stylesheet', href='/stylesheets/myStyle.css')
+    //- link(rel="stylesheet" href="/stylesheets/L.Control.Window.css")
+    link(rel='stylesheet', href='/stylesheets/nav.css')
+    link(rel='stylesheet', href='/stylesheets/micromodal.css')
+    script(src="/javascripts/leaflet.js")
+    script(src="/javascripts/micromodal.min.js")
+    //- script(src="/javascripts/L.Control.Window.js")
+    //- link(rel='stylesheet', href='/stylesheets/micromodal.css')
+    //- script(src="/javascripts/micromodal.min.js")
+    //- script(type='text/javascript').
+    //-   window.onload = function() {
+    //-     MicroModal.init();
+    //-   };
+  body
+    .wrap
+      include ./_header.pug
+      block content
+      include ./_footer.pug

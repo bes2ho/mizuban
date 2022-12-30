@@ -1,0 +1,16 @@
+header(class="modal__header")
+  h2(class="modal__title" id="modal-1-title") 集計結果
+  button(class="modal__close" aria-label="Close modal" data-micromodal-close)
+main(class="modal__content" id="modal-1-content")
+  ul
+    each item in data
+      li #{item._id} 
+        ul 
+          each color_group in item.color_group 
+            li #{color_group.color} #{color_group.count}
+footer(class="modal__footer")
+  if mizuban == 'on'
+    button(class="modal__btn modal__btn-primary" id="finish" onclick="finish()") 結果を記録して色をリセット
+  button(class="modal__btn" data-micromodal-close aria-label="Close this dialog window") 閉じる
+//- if mizuban == 'on'
+//-   button(id="finish" onclick="finish()") 結果を記録して色をリセット

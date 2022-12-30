@@ -1,0 +1,88 @@
+extends layout2
+
+block content
+  main
+    //- script(type='text/javascript').
+    //-   let tambo=!{tambo};
+    h1 田んぼ個別情報
+    //- p= tambo.properties.address
+    //- p= tambo.properties.area
+    //- p 面積は#{tambo.properties.area}
+    //- p= tambo.properties.farmer
+    //- p= tambo.properties.suito
+
+    form(class="main" method="post" action="")
+      input(type="hidden" name="taId" id="taId" value=`${tambo._id}`)
+      ul(style="list-style: none;")
+        li
+          label(for="address") 小字：
+          input(type="text" id="zone" name="zone" value=`${tambo.properties.zone}`)
+        li
+          label(for="address") 住所：
+          input(type="text" id="address" name="address" value=`${tambo.properties.address}`)
+          //- input(type="text" id="address" name="address")&attributes({'value':tambo.properties.address})
+        li
+          label(for="area") 面積：
+          input(type="text" id="area" name="area" value=`${tambo.properties.area}`)
+        //- li
+        //-   label(for="owner") 所有者：
+        //-   input(type="text" id="owner" name="owner")
+        li
+          label(for="farmer") 管理者：
+          select(name="farmer")
+            each user in headerUsers
+              option(value=user._id selected=(user._id==`${tambo.properties.farmer}`)) #{user.name}
+        li 
+          label(for="suito") 水稲：
+          input(type="checkbox" id="suito" name="suito" checked=(tambo.properties.color != "brown"))
+        li
+          button(type="submit" id="tamboSaveSubmit") 保存
+    script(type='text/javascript').
+      //- let modal;
+      //- function tamboUpdateModalOpen(){
+      //-   fetch('/report2')
+      //-     .then(response => response.text())
+      //-     .then(data => {
+      //-       let options = {
+      //-         title:'集計結果',
+      //-         content:data,
+      //-         modal: true,
+      //-         position:'topLeft' // 'center', 'top', 'topRight', 'right', 'bottomRight', 'bottom', 'bottomLeft', 'left', 'topLeft'
+      //-       };
+      //-       modal =  L.control.window(map, options).show();
+      //-   });
+      //- };
+      window.addEventListener('DOMContentLoaded', () => {
+          // (3) フォーム入力欄のHTMLを取得
+        const btn_tamboSave = document.getElementById("tamboSaveSubmit");
+        //- console.log(`btn_save ${btn_tamboSave}`);
+        btn_tamboSave.addEventListener('click', (e)=> {
+          e.preventDefault();
+          console.log("save called")
+          // (3) フォーム入力欄のHTMLを取得
+          const ta_id = document.querySelector('input[name=taId]');
+          const ta_zone = document.querySelector('input[name=zone]');
+          const ta_address = document.querySelector('input[name=address]');
+          const ta_area = document.querySelector('input[name=area]');
+          const ta_farmer = document.querySelector('select[name=farmer]');
+          const ta_suito = document.querySelector('input[name=suito]');
+          suito=ta_suito.checked ? 'on':'off';
+          const obj={
+            ta_id:ta_id.value,
+            ta_zone:ta_zone.value,
+            ta_address:ta_address.value,
+            ta_area:ta_area.value,
+            ta_farmer:ta_farmer.value,
+            ta_suito:suito
+          };
+          // (5) フォームの入力値を送信
+          fetch('/tamboUpdate', {
+            method: 'PUT',
+            body: JSON.stringify(obj),
+            headers: {'Content-Type': 'application/json'},
+          })
+          //- .then(response => response.json())
+          //- .then(data => {
+          //- });
+        });
+      });

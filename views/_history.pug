@@ -1,0 +1,14 @@
+header(class="modal__header")
+  h2(class="modal__title" id="modal-1-title") 作業履歴
+  button(class="modal__close" aria-label="Close modal" data-micromodal-close)
+main(class="modal__content" id="modal-1-content")
+  ul
+    each log in data
+      li #{log.date} #{log.time} 
+        ul 
+          li #{log.name} #{log.total} 町
+            ul 
+              each record in log.record
+                li #{record.zone} #{record.count} 町
+footer(class="modal__footer")
+  button(class="modal__btn" data-micromodal-close aria-label="Close this dialog window") 閉じる

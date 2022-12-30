@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>micromodal example</title>
+        <!-- Google Tag Manager -->
+        <!-- <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                })(window,document,'script','dataLayer','GTM-WGSP6XW');</script> -->
+        <!-- End Google Tag Manager  -->
+        <!-- micromodal -->
+        <script src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="./micromodal.css">
+    </head>
+    <body>
+    <!-- Google Tag Manager (noscript) -->
+    <!-- <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WGSP6XW"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <div id="main"> -->
+      <!--
+        Button
+      -->
+      <div>
+        <button data-micromodal-trigger="modal-1" role="button">Demo Modal</button>    
+      </div>
+      <div class="modal micromodal-slide" id="modal-1" aria-hidden="true">
+        <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+          <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+            <header class="modal__header">
+              <h2 class="modal__title" id="modal-1-title">
+                Micromodal
+              </h2>
+              <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+            </header>
+            <main class="modal__content" id="modal-1-content">
+              <p>
+                Try hitting the <code>tab</code> key and notice how the focus stays within the modal itself. Also, <code>esc</code> to close modal.
+              </p>
+            </main>
+            <footer class="modal__footer">
+              <button class="modal__btn modal__btn-primary">Continue</button>
+              <button class="modal__btn" data-micromodal-close aria-label="Close this dialog window">Close</button>
+            </footer>
+          </div>
+        </div>
+      </div>
+    <script>
+        MicroModal.init();
+        // MicroModal.isVisible = function() {
+        //     return document.querySelector('.is-open') != null
+        // }
+        // window.addEventListener('beforeunload', function(event) {
+        //   if(MicroModal.isVisible()){
+        //     event.preventDefault(); //prevent back nav
+        //     // for chrome
+        //     event.returnValue = '';
+        //   } else {
+        //     // Do Nothing...
+        //   }
+        // });
+        // window.addEventListener('keydown', function(event) {
+        //   if (event.code == 'Backspace') {
+        //     if(MicroModal.isVisible()) {
+        //         event.preventDefault();
+        //         MicroModal.close();
+        //     }
+        //   }
+        // });
+    </script>
+    </body>
+</html>

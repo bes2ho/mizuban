@@ -1,0 +1,11 @@
+extends layout2
+
+block content
+  main
+    //- script(type='text/javascript').
+    //-   let tambos =!{tambos};
+    h2 田一覧
+    ul
+      each ta in tambos
+        li: a(href=`/tas/${ta._id}`) #{ta.properties.zone} #{ta.properties.fid} #{ta.properties.address} #{ta.properties.area} #{ta.properties.farmer.name}
+

@@ -1,0 +1,62 @@
+html{
+  height:100%;
+  width: 100%;
+}
+body {
+  height: 100%;
+  font-size: 130%;
+  /* margin: 0px; */
+}
+.wrap {
+  display: flex;
+  flex-direction: column;
+  height:100%;
+}
+#map {
+  width: 99%;
+  height: 98%;
+  /* overflow: hidden; */
+  /* font: 14px "Lucida Grande", Helvetica, Arial, sans-serif; */
+}
+header#header {
+  /* position: sticky;
+  top: 0px; */
+  width: 98%;
+  height: 50px;
+  padding: 10px;
+  background: #bbb;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+main {
+  flex: 1;
+  /* width: 98%; */
+  /* padding: 10px; */
+  }
+#mapFooter {
+  /* position: sticky;
+  bottom: 0;
+  left: 0; */
+  width: 98%;
+  padding: 10px;
+  background: #bbb;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  /* font-size: 150%; */
+}
+img {
+  vertical-align: middle;
+  height: 20px;
+}
+button {
+  color:#fff;
+  background-color: rgb(119, 119, 119);
+  /* appearance: none; */
+  border: 0;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 90%;
+  padding: 2px 8px;
+}

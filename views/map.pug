@@ -1,0 +1,116 @@
+extends layout
+
+block content
+  main(style="overflow:hidden")
+    #map
+    //- button(id="btnCurLocation" onClick="setCurLocation()") 現在地を表示
+    script(type='text/javascript').
+      //- var map = L.map('map').setView([35.256887, 135.408569],16);
+      var map = L.map('map',{
+        center:[35.256887, 135.408569],
+        zoom: 16,
+        minZoom: 15,
+        maxZoom: 18});
+      const jp = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {attribution: "&copy; <a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>地理院タイル</a>"});
+      const gm = L.tileLayer('https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}', {
+          attribution: "<a href='https://developers.google.com/maps/documentation' target='_blank'>Google Map</a>"
+      });
+      jp.addTo(map);
+
+      function setCurLocation(){
+        if (navigator.geolocation == false){
+          alert('現在地を取得できませんでした。');
+          return;
+        }
+
+        function success(e) {
+          var lat  = e.coords.latitude;
+          var lng = e.coords.longitude;
+          map.setView([lat, lng], 15);
+          L.marker([lat,lng]).addTo(map).bindPopup('現在地').openPopup();
+        };
+
+        function error() {
+          alert('現在地を取得できませんでした。');
+        };
+
+        navigator.geolocation.getCurrentPosition(success, error);
+      }
+
+
+      //- 起動時に現在地を表示
+      //- function onLocationFound(e) {
+      //-     L.marker(e.latlng).addTo(mymap).bindPopup("現在地").openPopup();
+      //- }
+
+      //- function onLocationError(e) {
+      //-     alert("現在地を取得できませんでした。" + e.message);
+      //- }
+
+      //- map.on('locationfound', onLocationFound);
+      //- map.on('locationerror', onLocationError);
+
+      //- map.locate({setView: true, maxZoom: 16, timeout: 20000});
+
+
+      function style(feature) {
+        return {
+            color: feature.properties.color,
+            fillOpacity: 0.9
+        };
+      };
+      function setColor(e) {
+        let layer = e.target;
+        console.log(layer);
+        let newColor = (layer.options.color == "green")? "yellow": "dodgerblue";
+        console.log(`set ${layer.options.color}->${newColor}`)
+        layer.setStyle({
+            color: newColor
+        });
+        console.log(layer.feature.properties.color, layer.feature._id, layer.feature.properties._id);
+        // データベースに保存
+        const id = layer.feature._id;
+        fetch (`/map/${id}`,{method: "PUT"})
+          .then(console.log(`/map/${id}/update?_method=PUT`));
+      };
+      function showColor(e) {
+        let layer = e.target;
+        console.log(layer);
+      };
+      function onEachFeature(feature, layer) {
+        layer.on({
+            dblclick: setColor,
+            onclick: showColor
+        });
+        let label = L.marker(layer.getBounds().getCenter(), {
+          icon: L.divIcon({
+            className: 'label',
+            html: feature.properties.fid,
+            iconSize: [20, 20]
+          })
+        }).addTo(map);
+      };
+      let TamboLayer = L.geoJson(null, {style: style, onEachFeature: onEachFeature});
+
+      //- $.getJSON('/maplayers', function (data) {
+      //-   StationsLayer.addData(data);
+      //- });
+      //- StationsLayer.addTo(map);
+      fetch('/map/tambolayers')
+        .then(response => response.json())
+        .then(data => TamboLayer.addData(data));
+
+      TamboLayer.addTo(map);
+
+      function style2(feature) {
+        return {
+            color: feature.properties.color,
+            fillOpacity: 0.4
+        };
+      };
+      let TamboLayer2 = L.geoJson(null, {style: style2});
+      fetch('/map/tambolayers2')
+        .then(response => response.json())
+        .then(data => TamboLayer2.addData(data));
+
+      TamboLayer2.addTo(map);

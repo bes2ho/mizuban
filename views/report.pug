@@ -1,0 +1,11 @@
+extends layout2
+
+block content
+  main 
+    h1 水番　結果
+    ul
+      each item in data
+        li #{item._id} 
+        ul 
+          each color_group in item.color_group 
+            li #{color_group.color} #{color_group.count}

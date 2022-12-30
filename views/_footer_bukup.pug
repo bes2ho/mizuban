@@ -1,0 +1,103 @@
+footer(id="mapFooter")
+  button(id="btnCurLocation" class="nav_button" onClick="setCurLocation()") 現在地
+  button(id="reportModal" class="nav_button" onclick="reportModalOpen()") 集計
+  button(id="historyModal" class="nav_button" onclick="historyModalOpen()") 履歴
+  p
+    img(src="YellowFlag2.svg" width="32"  height="32")
+    span(id="yellow") 0
+    span 町 ,  配水
+    span(id="blue") 0
+    //- span(id="blue")= locals.blue
+    span 町
+script(type='text/javascript' defer).
+  //- const modal_title = document.getElementById("modal-1-title");
+  //- const modal_content = document.getElementById("modal-1-content");
+  //- const modal_footer = document.querySelector(".modal__footer")
+  const modal_container = document.querySelector(".modal__container")
+
+  function reportModalOpen(){
+    fetch('/report2')
+      .then(response => response.text())
+      .then(data => {
+        let options = {
+          title:'集計結果',
+          content:data,
+          modal: true,
+          position:'topLeft' // 'center', 'top', 'topRight', 'right', 'bottomRight', 'bottom', 'bottomLeft', 'left', 'topLeft'
+        };
+        modal_container.innerHTML = data;
+        //- if (mizuban=="on") {
+        //-   const btn_html='<button class="modal__btn modal__btn-primary" id="finish" onclick="finish()"> 結果を記録して色をリセット</button>';
+        //-   const fn = (html)=>{
+        //-     const dummyDiv = document.createElement("div");
+        //-     dummyDiv.innerHTML=btn_html;
+        //-     return dummyDiv.firstElementChild;
+        //-   };
+        //-   const newBtn = fn(btn_html);
+        //-   modal_footer.prepend(newBtn);
+        //- }
+        MicroModal.show('modal-1');
+        //- modal =  L.control.window(map, options).show();
+    });
+  };
+    function historyModalOpen(){
+    fetch('/history')
+      .then(response => response.text())
+      .then(data => {
+        let options = {
+          title:'作業履歴',
+          content:data,
+          modal: true,
+          position:'topLeft' // 'center', 'top', 'topRight', 'right', 'bottomRight', 'bottom', 'bottomLeft', 'left', 'topLeft'
+        };
+        //- modal =  L.control.window(map, options).show();
+        modal_container.innerHTML = data;
+        MicroModal.show('modal-1');
+    });
+  };
+  // モーダルの中から呼出し
+  function finish(){
+    fetch('/finish')  // 水番結果を保存し、モーダルを閉じ、青を緑にリセットして地図更新
+      .then(response => response.text())
+      .then(data =>{
+        console.log(data);
+        if(data=='success') MicroModal.close('modal-1');
+        refresh();
+      })
+  };
+  // headerの更新ボタンで、新たなユーザーあるいは水番モードで田んぼデータを再描画
+  //- window.addEventListener('DOMContentLoaded', () => {
+  //-   console.log('DOMContentLoaded');
+    // (1) 送信ボタンのHTMLを取得
+  const btn_submit = document.getElementById("userSubmit");
+
+  btn_submit.addEventListener('click', (e)=> {
+    e.preventDefault();
+
+    // (3) フォーム入力欄のHTMLを取得
+    const input_mizuban = document.querySelector('input[name=mizuban]');
+    const input_user = document.querySelector('select[name=farmer1]');
+    mizuban=input_mizuban.checked ? 'on':'off';
+    myId=input_user.value;
+    const obj={myId:myId, mizuban:mizuban};
+    console.log(`footer ${mizuban}, ${myId}`);
+    // (5) フォームの入力値を送信
+    fetch('/refresh', {
+      method: 'POST',
+      body: JSON.stringify(obj),
+      headers: {'Content-Type': 'application/json'},
+    })
+    .then(response => response.json())
+    .then(data => {
+      setFooterCount(yellowBlueCount(data));
+      if (map.hasLayer(TamboLayer)) map.removeLayer(TamboLayer);
+      TamboLayer = null;
+      TamboLayer = L.geoJson(null, {style: style, onEachFeature: onEachFeature});
+      TamboLayer.addData(data);
+      TamboLayer.addTo(map);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  });
+  //- });

@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  main
+    ul
+      each user in users
+        li= user.name
+    form 
+      select(name="farmer")
+        each user in users
+          option(value=user._id selected=(user._id=='62cb692f1bbe0d64de1fdea9')) #{user.name}
+      button(type="submit") update

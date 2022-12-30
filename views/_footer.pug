@@ -1,0 +1,304 @@
+footer(id="mapFooter")
+  button(id="btnCurLocation" class="nav_image" onClick="setCurLocation()")
+    img(src="./images/here.png" height ="30" width="30")
+  button(id="reportModal" class="nav_button" onclick="reportModalOpen()") 集計
+  button(id="historyModal" class="nav_button" onclick="historyModalOpen()") 履歴
+  p
+    img(src="YellowFlag2.svg" width="32"  height="32")
+    span(id="yellow") 0
+    span 町 ,  配水
+    span(id="blue") 0
+    //- span(id="blue")= locals.blue
+    span 町
+script(type='text/javascript' defer).
+  let TamboLayer;
+  const spanYellow=document.querySelector('#yellow');
+  const spanBlue=document.querySelector('#blue');
+  const modal_container = document.querySelector(".modal__container")
+  const input_mizuban = document.querySelector('input[name=mizuban]');
+  const input_user = document.querySelector('select[name=farmer1]');
+  let mizuban, myId;
+  mizuban=input_mizuban.checked ? 'on':'off';
+  myId=input_user.value;
+
+  function yellowBlueCount(features){
+    let y=0, b=0;
+    features.forEach(feature=>{
+      if (feature.properties.color=='yellow') y++;
+      if (feature.properties.color=='dodgerblue') b++;
+    });
+    return {yellow:y, blue:b};
+  };
+  function setFooterCount(y_b_obj){
+    //- const spanYellow=document.querySelector('#yellow');
+    //- const spanBlue=document.querySelector('#blue');
+    spanYellow.innerHTML=y_b_obj.yellow ;
+    spanBlue.innerHTML=y_b_obj.blue;
+  };
+  function changeFooterCount(y,b){
+    //- const spanYellow=document.querySelector('#yellow');
+    //- const spanBlue=document.querySelector('#blue');
+    let yellowCount=spanYellow.innerHTML;
+    let blueCount=spanBlue.innerHTML;
+    //- if (yellowCount == "") yellowCount='0';
+    //- if (blueCount == "") blueCount='0';
+    spanYellow.innerHTML = parseInt(yellowCount) + y;
+    spanBlue.innerHTML = parseInt(blueCount) + b;
+    //- spanYellow.innerHTML=y_b_obj.yellow ;
+    //- spanBlue.innerHTML=y_b_obj.blue;
+  };
+  // footerのfinish(集計)ボタンから呼ばれる
+  //- var map = L.map('map').setView([35.256887, 135.408569],16);
+
+  var map = L.map('map',{
+    center:[35.256887, 135.408569],
+    zoom: 16,
+    minZoom: 15,
+    maxZoom: 18});
+  const jp = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {attribution: "&copy; <a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>地理院タイル</a>"});
+  const gm = L.tileLayer('https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}', {
+      attribution: "<a href='https://developers.google.com/maps/documentation' target='_blank'>Google Map</a>"
+  });
+  jp.addTo(map);
+
+  TamboLayer = L.geoJson(null, {style: style, onEachFeature: onEachFeature});
+  if (myId){
+    fetch('/tambolayers')
+      .then(response => response.json())
+      .then(data => {
+        setFooterCount(yellowBlueCount(data));
+        TamboLayer.addData(data);
+        TamboLayer.addTo(map);
+      });
+  };
+  MicroModal.init({disableScroll: false});
+
+  //- const SuiroLayer = L.geoJson(null, {style:{"color": "steelblue", "weight": 4}});
+  //- fetch('/suiro')
+  //- .then(response => response.json())
+  //- .then(data => {
+  //-   SuiroLayer.addData(data);
+  //-   SuiroLayer.addTo(map);
+  //- });
+
+  function setCurLocation(){
+    if (navigator.geolocation == false){
+      alert('現在地を取得できませんでした。');
+      return;
+    }
+
+    function success(e) {
+      var lat  = e.coords.latitude;
+      var lng = e.coords.longitude;
+      map.setView([lat, lng], 18);
+      //- L.marker([lat,lng]).addTo(map).bindPopup('現在地').openPopup();
+    };
+
+    function error() {
+      alert('現在地を取得できませんでした。');
+    };
+    navigator.geolocation.getCurrentPosition(success, error);
+  };
+
+  function refresh(){
+    fetch('/tambolayers')
+      .then(response => response.json())
+      .then(data =>{
+        //- console.log(data);
+        setFooterCount(yellowBlueCount(data));
+        map.removeLayer(TamboLayer);
+        TamboLayer = null;
+        TamboLayer = L.geoJson(null, {style: style, onEachFeature: onEachFeature});
+        TamboLayer.addData(data);
+        TamboLayer.addTo(map);
+        //- spanYellow=document.querySelector('#yellow');
+        //- spanBlue=document.querySelector('#blue');
+        //- spanYellow.innerHTML=count.yellow ;
+        //- spanBlue.innerHTML=count.blue;
+      });
+  };
+
+  function style(feature) {
+    if(mizuban=="on" || feature.properties.farmer == myId){
+      return {
+        color: feature.properties.color,
+        fillOpacity: 0.9
+      };
+    };
+    if (mizuban=="off" && feature.properties.farmer != myId) {
+      return {
+        color: feature.properties.color,
+        fillOpacity: 0.3
+      };
+    };
+  };
+  function getNewColor(color){
+    if (input_mizuban.checked){
+      if (color == 'yellow') return 'dodgerblue';
+      if (color == 'dodgerblue') return 'yellow';
+    } else {
+      if (color == 'yellow') return 'green';
+      if (color == 'green') return 'yellow';
+    }
+    return color;
+  };
+  function setColor(e) {
+    let layer = e.target;
+    const newColor=getNewColor(layer.options.color);
+    layer.setStyle({
+        color: newColor
+    });
+      console.log(layer.feature.properties.color, layer.feature._id, layer.feature.properties._id);
+      // データベースに保存
+    const id = layer.feature._id;
+    fetch (`/${id}/${newColor}`)
+    .then(response => response.json())
+    .then(data=>{
+      spanYellow.innerHTML=data.yellow;
+      spanBlue.innerHTML=data.blue;
+    })
+      //- // 色ごとの集計結果が返ってくる
+      //- .then(response => response.json())
+      //- .then(data =>{
+      //-   console.log(`fetch return ${data.yellow} ${data.blue}`);
+      //-   //- spanYellow=document.querySelector('#yellow');
+      //-   //- spanBlue=document.querySelector('#blue');
+      //-   spanYellow.innerHTML=data.yellow;
+      //-   spanBlue.innerHTML=data.blue;
+  };
+  //- function setColor(e) {
+  //-   let layer = e.target;
+  //-   if (layer.options.color  == "green" ||
+  //-     (layer.options.color  == "yellow" && mizuban=='on')){
+  //-     let newColor = (layer.options.color  == "green")? "yellow": "dodgerblue";
+  //-     layer.setStyle({
+  //-         color: newColor
+  //-     });
+  //-     console.log(layer.feature.properties.color, layer.feature._id, layer.feature.properties._id);
+  //-     // データベースに保存
+  //-     const id = layer.feature._id;
+  //-     fetch (`/${id}`)
+  //-       //- // 色ごとの集計結果が返ってくる
+  //-       .then(response => response.json())
+  //-       .then(data =>{
+  //-         console.log(`fetch return ${data.yellow} ${data.blue}`);
+  //-         //- spanYellow=document.querySelector('#yellow');
+  //-         //- spanBlue=document.querySelector('#blue');
+  //-         spanYellow.innerHTML=data.yellow;
+  //-         spanBlue.innerHTML=data.blue;
+
+  //-       });
+  //-   };
+  //- };
+  function onEachFeature(feature, layer) {
+    if(mizuban=="off" && feature.properties.farmer == myId 
+      && ((feature.properties.color == "yellow") || (feature.properties.color == "green"))){
+      layer.on({
+          dblclick: setColor,
+          //- onclick: showColor
+      });
+    };
+    if(mizuban=="on" && ((feature.properties.color == "yellow") || (feature.properties.color == "dodgerblue"))){
+      layer.on({
+          dblclick: setColor,
+          //- onclick: showColor
+      });
+    };
+    let label = L.marker(layer.getBounds().getCenter(), {
+      icon: L.divIcon({
+        className: 'label',
+        html: feature.properties.fid,
+        iconSize: [14, 14]
+      })
+    }).addTo(map);
+  };
+
+  function reportModalOpen(){
+    fetch('/report2')
+      .then(response => response.text())
+      .then(data => {
+        //- let options = {
+        //-   title:'集計結果',
+        //-   content:data,
+        //-   modal: true,
+        //-   position:'topLeft' // 'center', 'top', 'topRight', 'right', 'bottomRight', 'bottom', 'bottomLeft', 'left', 'topLeft'
+        //- };
+        modal_container.innerHTML = data;
+        //- if (mizuban=="on") {
+        //-   const btn_html='<button class="modal__btn modal__btn-primary" id="finish" onclick="finish()"> 結果を記録して色をリセット</button>';
+        //-   const fn = (html)=>{
+        //-     const dummyDiv = document.createElement("div");
+        //-     dummyDiv.innerHTML=btn_html;
+        //-     return dummyDiv.firstElementChild;
+        //-   };
+        //-   const newBtn = fn(btn_html);
+        //-   modal_footer.prepend(newBtn);
+        //- }
+        MicroModal.show('modal-1');
+        //- modal =  L.control.window(map, options).show();
+    });
+  };
+  function historyModalOpen(){
+    fetch('/history')
+      .then(response => response.text())
+      .then(data => {
+        modal_container.innerHTML = data;
+        MicroModal.show('modal-1');
+    });
+  };
+  // モーダルの中から呼出し
+  function finish(){
+    fetch('/finish')  // 水番結果を保存し、モーダルを閉じ、青を緑にリセットして地図更新
+      .then(response => response.text())
+      .then(data =>{
+        console.log(data);
+        if(data=='success') MicroModal.close('modal-1');
+        refresh();
+      })
+  };
+  // headerの更新ボタンで、新たなユーザーあるいは水番モードで田んぼデータを再描画
+  //- window.addEventListener('DOMContentLoaded', () => {
+  //-   console.log('DOMContentLoaded');
+    // (1) 送信ボタンのHTMLを取得
+  const btn_submit = document.getElementById("userSubmit");
+
+  btn_submit.addEventListener('click', (e)=> {
+    e.preventDefault();
+      // (3) フォーム入力欄のHTMLを取得
+    mizuban=input_mizuban.checked ? 'on':'off';
+    myId=input_user.value;
+    const obj={myId:myId, mizuban:mizuban};
+    console.log(`footer ${mizuban}, ${myId}`);
+    // (5) フォームの入力値を送信
+    fetch('/refresh', {
+      method: 'POST',
+      body: JSON.stringify(obj),
+      headers: {'Content-Type': 'application/json'},
+    })
+    .then(res=>{
+      console.log('res=', res);
+      if (res='OK') refresh();
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  });
+
+  //-   //- setTimeout(()=>{
+  //-   //-   map.removeLayer(TamboLayer);
+  //-   //- },2000)
+  //- };
+
+  //- const MicroModal = require('micromodal');
+  //- function style2(feature) {
+  //-   return {
+  //-       color: feature.properties.color,
+  //-       fillOpacity: 0.4
+  //-   };
+  //- };
+  //- let TamboLayer2 = L.geoJson(null, {style: style2});
+  //- fetch('/tambolayers2')
+  //-   .then(response => response.json())
+  //-   .then(data => TamboLayer2.addData(data));
+
+  //- TamboLayer2.addTo(map);

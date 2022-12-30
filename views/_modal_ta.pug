@@ -1,0 +1,68 @@
+- let headerUsers=[
+  { _id: '62cb692f1bbe0d64de1fdeab', name: '別所秀一', turn: 3, __v: 0 },
+  { _id: '62cb692f1bbe0d64de1fdea9', name: '片山弘明', turn: 1, __v: 0 },
+  { _id: '62cb692f1bbe0d64de1fdeaa', name: '築山茂治', turn: 2, __v: 0 },
+  { _id: '62cf5d0b614f0e6816b53b45', name: '梅原主次', turn: 4, __v: 0 }
+];
+div(id="modal-1" aria-hidden="true")
+  div(tabindex="-1" data-micromodal-close)
+    div(role="dialog" aria-modal="true" aria-labelledby="modal-1-title")
+      header
+        h2(id="modal-1-title") Modal Title
+        button(aria-label="Close modal" data-micromodal-close) x
+      div(id="modal-1-content") Modal Content
+      footer(class="modal__footer")
+        button(type="submit" id="tamboSaveSubmit") 保存
+        h1 田んぼ個別情報
+        form(class="main" method="post" action="")
+          input(type="hidden" name="taId" id="taId" value=`${tambo._id}`)
+          ul(style="list-style: none;")
+            li
+              label(for="address") 小字：
+              input(type="text" id="zone" name="zone" value=`${tambo.properties.zone}`)
+            li
+              label(for="address") 住所：
+              input(type="text" id="address" name="address" value=`${tambo.properties.address}`)
+            li
+              label(for="area") 面積：
+              input(type="text" id="area" name="area" value=`${tambo.properties.area}`)
+            li
+              label(for="farmer") 管理者：
+              select(name="farmer")
+                each user in headerUsers
+                  option(value=user._id selected=(user._id==`${tambo.properties.farmer}`)) #{user.name}
+            li 
+              label(for="suito") 水稲：
+              input(type="checkbox" id="suito" name="suito" checked=(tambo.properties.color != "brown"))
+script(type='text/javascript').
+  window.addEventListener('DOMContentLoaded', () => {
+      // (3) フォーム入力欄のHTMLを取得
+    const contents = document.getElementById("tamboSaveSubmit");
+    console.log(`btn_save ${btn_tamboSave}`);
+    btn_tamboSave.addEventListener('click', (e)=> {
+      e.preventDefault();
+      console.log("save called")
+      // (3) フォーム入力欄のHTMLを取得
+      const ta_id = document.querySelector('input[name=taId]');
+      const ta_zone = document.querySelector('input[name=zone]');
+      const ta_address = document.querySelector('input[name=address]');
+      const ta_area = document.querySelector('input[name=area]');
+      const ta_farmer = document.querySelector('select[name=farmer]');
+      const ta_suito = document.querySelector('input[name=suito]');
+      suito=ta_suito.checked ? 'on':'off';
+      const obj={
+        ta_id:ta_id.value,
+        ta_zone:ta_zone.value,
+        ta_address:ta_address.value,
+        ta_area:ta_area.value,
+        ta_farmer:ta_farmer.value,
+        ta_suito:suito
+      };
+      // (5) フォームの入力値を送信
+      fetch('/tamboUpdate', {
+        method: 'PUT',
+        body: JSON.stringify(obj),
+        headers: {'Content-Type': 'application/json'},
+      })
+    });
+  });

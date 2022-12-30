@@ -1,0 +1,71 @@
+- 
+  let headerUsers=[
+    {_id:"62ee1e6a91d541f17f9fb7e6", name:"選択してね", turn:0},
+    {_id:"62ee1e6a91d541f17f9fb7e7", name:"梅原主次", turn:1},
+    {_id:"62ee1e6a91d541f17f9fb7e8", name:"梅原三好", turn:2},
+    {_id:"62ee1e6a91d541f17f9fb7e9", name:"片山勝利", turn:3},
+    {_id:"62ee1e6a91d541f17f9fb7ea", name:"正田周吉", turn:4},
+    {_id:"62ee1e6a91d541f17f9fb7eb", name:"梅原久代", turn:5},
+    {_id:"62ee1e6a91d541f17f9fb7ec", name:"梅原義幸", turn:6},
+    {_id:"62ee1e6a91d541f17f9fb7ed", name:"谷本貴明", turn:7},
+    {_id:"62ee1e6a91d541f17f9fb7ee", name:"正田久仁雄", turn:8},
+    {_id:"62ee1e6a91d541f17f9fb7ef", name:"片山光次", turn:9},
+    {_id:"62ee1e6a91d541f17f9fb7f0", name:"尾池允嘉", turn:10},
+    {_id:"62ee1e6a91d541f17f9fb7f1", name:"尾池吉嗣", turn:11},
+    {_id:"62ee1e6a91d541f17f9fb7f2", name:"尾池俊明", turn:12},
+    {_id:"62ee1e6a91d541f17f9fb7f3", name:"梅原眞", turn:13},
+    {_id:"62ee1e6a91d541f17f9fb7f4", name:"片山里史", turn:14},
+    {_id:"62ee1e6a91d541f17f9fb7f5", name:"片山博至", turn:15},
+    {_id:"62ee1e6a91d541f17f9fb7f6", name:"尾池テル", turn:16},
+    {_id:"62ee1e6a91d541f17f9fb7f7", name:"白樫貢", turn:17},
+    {_id:"62ee1e6a91d541f17f9fb7f8", name:"片山弘明", turn:18},
+    {_id:"62ee1e6a91d541f17f9fb7f9", name:"谷本徹", turn:19},
+    {_id:"62ee1e6a91d541f17f9fb7fa", name:"別所秀一", turn:20},
+    {_id:"62ee1e6a91d541f17f9fb7fb", name:"築山茂治", turn:21},
+    {_id:"62ee1e6a91d541f17f9fb7fc", name:"隅山昌明", turn:22},
+    {_id:"62ee1e6a91d541f17f9fb7fd", name:"松村千絵", turn:23}
+  ];
+  //- users.forEach(user=>if(user._id))
+header(id="header")
+  .menu
+  .selection
+    form(id="user" method="post" action="/")
+      label(for="mizuban") 水番
+      input(type="checkbox" id="mizuban" name="mizuban" checked=(mizuban=='on'))
+      //- select(name="farmer1" onchange="this.form.submit()" style="font-size:100%")
+      select(name="farmer1" id="farmer1" style="font-size:100%" required)
+        //- option(value="" hidden) 選択してください
+        each user in headerUsers
+          option(value=user._id selected=(user._id==myId))= user.name
+      //- option(value=user._id selected=(user._id=='62cb692f1bbe0d64de1fdea9')) #{user.name}
+      button(class="nav_button" type="submit" id="userSubmit") 更新
+nav
+  input(id="gnav-input" type="checkbox" class="gnav-hidden")
+  label(id="gnav-btn" for="gnav-input")
+  label(id="gnav-black" for="gnav-input")
+  div(id="gnav-content")
+    ul(class="gnav-list")
+      if currentURL == "/"
+        li 地図
+      else
+        li: a(href="/") 地図 
+      if currentURL == "/tas"
+        li 田んぼデータ
+      else 
+        li: a(href="/tas") 田んぼデータ
+        
+//- var users;
+//- if (sessionStorage.getItem('users') === null){
+//-   fetch('/users/menu')
+//-   .then(response => response.json())
+//-   .then(data => {
+//-     users=data;
+//-     sessionStorage.setItem('users',JSON.stringify(users))
+//- });
+//- } else {
+//-   var usersStr = sessionStorage.getItem('users');
+//-   users = JSON.parse(usersStr);
+//- }
+//- let users=["bessho","katayama"]
+//- script(type='text/javascript').
+//-   let name=!{name};

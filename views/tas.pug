@@ -1,0 +1,197 @@
+extends layout2
+
+block content
+  main
+    //- script(type='text/javascript').
+    //-   let tambos =!{tambos};
+    h1 田一覧
+    table
+      thead
+        tr 
+          th ID
+          th 小字
+          th 住所
+          th 面積
+          th 管理者
+          th 水稲
+      tbody 
+        - let zone=""
+        each ta in tambos
+          tr(class="clickable" id=`${ta._id}`)
+            td=ta.properties.fid
+            if (zone != ta.properties.zone)
+              td=ta.properties.zone
+              //- td(rowspan=`${zoneCount[ta.properties.zone]}`)=ta.properties.zone
+            else 
+              td(style="color:#fff")=ta.properties.zone
+            - zone = ta.properties.zone
+            td=ta.properties.address
+            td=ta.properties.area
+            td(id=`${ta.properties.farmer._id}`)=ta.properties.farmer.name
+            td
+              input(type="checkbox" id="suito" name="suito" checked=(ta.properties.color != "brown") disabled)
+    div(class="modal micromodal-slide" id="modal-1" aria-hidden="true")
+      //- div(class="modal__overlay" tabindex="-1" data-micromodal-closee) windowのどこをクリックしてもclose
+      div(class="modal__overlay" tabindex="-1")
+        div(class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title")
+          header(class="modal__header")
+            h2(class="modal__title" id="modal-1-title") 田んぼ個別情報
+            button(class="modal__close" aria-label="Close modal" data-micromodal-close)
+          main(class="modal__content" id="modal-1-content")
+            form(class="main" method="post" action="")
+              input(type="hidden" name="taId" id="taId")
+              ul(style="list-style: none;")
+                li
+                  label(for="fis") ID：
+                  input(type="text" id="modal_fid" name="fid" disabled)
+                li
+                  label(for="zone") 小字：
+                  input(type="text" id="modal_zone" name="zone")
+                li
+                  label(for="address") 住所：
+                  input(type="text" id="modal_address" name="address")
+                li
+                  label(for="area") 面積：
+                  input(type="text" id="modal_area" name="area")
+                li
+                  label(for="farmer") 管理者：
+                  select(name="farmer")
+                    each user in headerUsers
+                      option(value=user._id) #{user.name}
+                li 
+                  label(for="suito") 水稲：
+                  input(type="checkbox" id="modal_suito" name="modal_suito")
+                //- li
+                //-   button(type="submit" id="tamboSaveSubmit") 保存
+          footer(class="modal__footer")
+            button(class="modal__btn modal__btn-primary" type="submit" id="tamboSaveSubmit") 保存
+            button(class="modal__btn" data-micromodal-close aria-label="Close this dialog window") キャンセル
+  script(type='text/javascript' defer).
+    MicroModal.init({disableScroll: false});
+
+    let id;
+    let clicked_fid, clicked_zone, clicked_address, clicked_area, clicked_farmer, clicked_suito;
+
+      // (3) フォーム入力欄のHTMLを取得
+    const btn_tamboSave = document.getElementById("tamboSaveSubmit");
+    const contents = document.getElementById("modal-1-content");
+    const tr_clickable = document.querySelectorAll('.clickable');
+    // modal form element取得
+    const ta_id = document.querySelector('input[name=taId]');
+    const ta_fid = document.querySelector('input[name=fid]');
+    const ta_zone = document.querySelector('input[name=zone]');
+    const ta_address = document.querySelector('input[name=address]');
+    const ta_area = document.querySelector('input[name=area]');
+    const ta_farmer = document.querySelector('select[name=farmer]');
+    const ta_suito = document.querySelector('input[name=modal_suito]');
+    //- console.log(`btn_save ${btn_tamboSave}`);
+    tr_clickable.forEach(tr=>{  // 田んぼ個別情報表示　DOMバージョン
+      tr.addEventListener('click', (e)=> {
+        // 田んぼ一覧テーブルデータのelement取得
+        id=e.currentTarget.id;
+        clicked_fid=e.currentTarget.childNodes[0]
+        ta_fid.value=clicked_fid.innerText;
+        clicked_zone=e.currentTarget.childNodes[1]
+        ta_zone.value=clicked_zone.innerText;
+        clicked_address=e.currentTarget.childNodes[2]
+        ta_address.value=clicked_address.innerText;
+        clicked_area=e.currentTarget.childNodes[3]
+        ta_area.value=clicked_area.innerText;
+        clicked_farmer=e.currentTarget.childNodes[4]
+        ta_farmer.value=clicked_farmer.id;
+        clicked_suito=e.currentTarget.childNodes[5].childNodes[0];
+        let on_off= clicked_suito.checked; // true or false
+        ta_suito.checked=on_off;
+        //- console.log(id, zone, address, area, farmer, suito);
+        MicroModal.show('modal-1');
+      });
+    });
+    //- tr_clickable.forEach(tr=>{  // 田んぼ個別情報表示　Fetchバージョン
+    //-   tr.addEventListener('click', (e)=> {
+    //-     //- e.preventDefault();
+    //-     console.log(e.currentTarget.id)
+    //-     const ta_id = document.querySelector('input[name=taId]');
+    //-     const ta_zone = document.querySelector('input[name=zone]');
+    //-     const ta_address = document.querySelector('input[name=address]');
+    //-     const ta_area = document.querySelector('input[name=area]');
+    //-     const ta_farmer = document.querySelector('select[name=farmer]');
+    //-     const ta_suito = document.querySelector('input[name=suito]');
+    //-     fetch(`/tas/${e.currentTarget.id}`)
+    //-     .then(response => response.text())
+    //-     .then(data => {
+    //-       //- contents.innerHTML=data;
+    //-       MicroModal.show('modal-1');
+    //-     });
+    //-   });
+    //- });
+    btn_tamboSave.addEventListener('click', (e)=> {
+      e.preventDefault();
+      console.log("save called")
+      // (3) フォーム入力欄のHTMLを取得
+      //- const ta_id = document.querySelector('input[name=taId]');
+      //- const ta_zone = document.querySelector('input[name=zone]');
+      //- const ta_address = document.querySelector('input[name=address]');
+      //- const ta_area = document.querySelector('input[name=area]');
+      //- const ta_farmer = document.querySelector('select[name=farmer]');
+      //- const ta_suito = document.querySelector('input[name=suito]');
+      suitoCheck=ta_suito.checked ? 'on':'off';
+      let farmer_name = ta_farmer.options[ta_farmer.selectedIndex].textContent;
+      const obj={
+        ta_id:id,
+        ta_fid:ta_fid.value,
+        ta_zone:ta_zone.value,
+        ta_address:ta_address.value,
+        ta_area:ta_area.value,
+        ta_farmer:ta_farmer.value,
+        ta_suito:suitoCheck
+      };
+      console.log("tas.pug", id,ta_zone.value,ta_address.value,ta_area.value,ta_farmer.value,suitoCheck);
+      // (5) フォームの入力値を送信
+      fetch('/tamboUpdate', {
+        method: 'PUT',
+        body: JSON.stringify(obj),
+        headers: {'Content-Type': 'application/json'},
+      })
+      .then(res=>{
+        if (res.ok){
+          clicked_fid.innerText=obj.ta_fid;
+          clicked_zone.innerText=obj.ta_zone;
+          clicked_address.innerText=obj.ta_address;
+          clicked_area.innerText=obj.ta_area;
+          clicked_farmer.id=obj.ta_farmer;
+          clicked_farmer.innerText=farmer_name;
+          clicked_suito.checked=ta_suito.checked;
+          MicroModal.close('modal-1');
+        }
+      })
+      .catch(err=>console.log(err));
+      //- .then(res=>console.log(res.json()))==>promise(fulfilled) + 更新されたオブジェクト
+    });
+    const btn_submit = document.getElementById("userSubmit");
+    const input_mizuban = document.querySelector('input[name=mizuban]');
+    const input_user = document.querySelector('select[name=farmer1]');
+
+    btn_submit.addEventListener('click', (e)=> {
+      e.preventDefault();
+
+      mizuban=input_mizuban.checked ? 'on':'off';
+      myId=input_user.value;
+      const obj={myId:myId, mizuban:mizuban};
+      console.log(`footer ${mizuban}, ${myId}`);
+      // (5) フォームの入力値を送信
+      fetch('/refresh', {
+        method: 'POST',
+        body: JSON.stringify(obj),
+        headers: {'Content-Type': 'application/json'},
+      })
+      .then(res=>{
+        console.log('res=', res);
+        if (res='OK') location.reload();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    });
+
+      
+
