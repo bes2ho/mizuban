@@ -104,8 +104,10 @@ const tools={
       let newData=[];
       let newLog, newRecord, zone, count;
       data.forEach(log=>{ //データ変換
+        // Herokuでは、以下のようにJSTが使えた。
         // newLog = new Log(log.created.toLocaleDateString("ja-JP", {timeZone:"JST"}),log.created.toLocaleTimeString("ja-JP", {timeZone:"JST"}),log.farmer.name);
         newLog = new Log(tz.formatInTimeZone(log.created, 'Asia/Tokyo', 'yyyy-MM-dd'),tz.formatInTimeZone(log.created, 'Asia/Tokyo', 'HH:mm'),log.farmer.name);
+        // renderではJSTが使えなかったので、上記のようにdate-fns-tzをインポートして利用
         count=0;
         log.record.forEach(record=>{
           zone=record._id;

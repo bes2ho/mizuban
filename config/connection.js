@@ -9,7 +9,9 @@ const db = 'mongodb://localhost:27017/mizuban'
 // mongoose.connect(db, { useNewUrlParser: true });
 const uri = "mongodb+srv://bes2ho:H990TZLQovG8nhkr@wachi.qoglm.mongodb.net/mizuban?retryWrites=true&w=majority"
 console.log(`process.env.PORT=${process.env.PORT}`);
+// HerokuやAzureのようなクラウドホストでは、PORT変数を使用して、ルーティングが正しく動作するためにサーバがどのポートをリッスンすべきかを教えてくれます。
 target = (process.env.PORT)? uri :db;
+console.log(target)
 mongoose.connect(
   target,
   {
